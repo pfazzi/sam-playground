@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: A polyglot SAM app
+  
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  HelloWorldJsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: hello-world-js/
+      Handler: app.lambdaHandler
+      Runtime: nodejs12.x
+      Events:
+        HelloWorldJs:
+          Type: Api
+          Properties:
+            Path: /hello-js
+            Method: get
+
+  HelloWorldPhpFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: hello-world-php/
+      Handler: lambda_handler.php
+      Runtime: provided.al2
+      Layers:
+        - 'arn:aws:lambda:eu-central-1:209497400698:layer:php-80:7'
+      Events:
+        HelloWorldPhp:
+          Type: Api
+          Properties:
+            Path: /hello-php
+            Method: get
+
+Outputs:
+  HelloWorldJsApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World JS function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello-js/"
+  HelloWorldPhpApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World PHP function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello-php/"
+  HelloWorldJsFunction:
+    Description: "Hello World JS Lambda Function ARN"
+    Value: !GetAtt HelloWorldJsFunction.Arn
+  HelloWorldPhpFunction:
+    Description: "Hello World PHP Lambda Function ARN"
+    Value: !GetAtt HelloWorldJsFunction.Arn
